@@ -1,0 +1,26 @@
+# Build output
+build/
+build-plugin/
+cmake-build-*/
+node_modules/
+DerivedData/
+
+# macOS cruft
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor/IDE
+*.swp
+*~
+.vscode/
+.idea/
+.cache/
+
+# Per-machine Claude Code settings
+.claude/settings.local.json
+
+# Bulky static reference lives in iCloud, not here -- see
+# _ARCHIVE-IS-IN-ICLOUD.md
+_desktop-intake/
