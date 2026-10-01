@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>ScreenshotToggle</string>
+	<string>ScreenBar</string>
 	<key>CFBundleDisplayName</key>
-	<string>ScreenshotToggle</string>
+	<string>ScreenBar</string>
 	<key>CFBundleExecutable</key>
-	<string>ScreenshotToggle</string>
+	<string>ScreenBar</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.thekitchenstudio.screenshottoggle</string>
+	<string>com.thekitchenstudio.screenbar</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

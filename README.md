@@ -1,4 +1,4 @@
-# ScreenshotToggle
+# ScreenBar
 
 A small macOS menu bar app that opens and closes Apple's Screenshot palette
 (the Cmd-Shift-5 capture bar) from one click.
@@ -14,7 +14,7 @@ Runs as an agent app (`LSUIElement`) — no Dock icon, no menu bar menus of its 
 
 ```sh
 scripts/build.sh      # builds, ad-hoc signs, installs to ~/Applications
-open ~/Applications/ScreenshotToggle.app
+open ~/Applications/ScreenBar.app
 ```
 
 Builds in `/private/tmp` on purpose: files created under `$HOME` pick up a

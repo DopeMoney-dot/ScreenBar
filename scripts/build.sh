@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Build ScreenshotToggle.app and install it to ~/Applications.
+# Build ScreenBar.app and install it to ~/Applications.
 #
 # Builds in /private/tmp on purpose: files created anywhere under $HOME get a
 # com.apple.provenance xattr that makes `codesign` fail on a Swift binary.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-APP_NAME="ScreenshotToggle"
+APP_NAME="ScreenBar"
 BUILD="/private/tmp/${APP_NAME}-build.$$"
 APP="${BUILD}/${APP_NAME}.app"
 DEST="${HOME}/Applications/${APP_NAME}.app"
@@ -22,7 +22,7 @@ swiftc -O \
   -o "${APP}/Contents/MacOS/${APP_NAME}" \
   "${REPO}/Sources/main.swift"
 
-codesign --force --sign - --identifier com.thekitchenstudio.screenshottoggle "$APP"
+codesign --force --sign - --identifier com.thekitchenstudio.screenbar "$APP"
 codesign --verify --strict "$APP"
 
 mkdir -p "${HOME}/Applications"

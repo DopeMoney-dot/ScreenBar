@@ -1,8 +1,8 @@
-# Reference / intake material for ScreenshotToggle lives in iCloud
+# Reference / intake material for ScreenBar lives in iCloud
 
-    ~/Library/Mobile Documents/com~apple~CloudDocs/Claude Project Archives/ScreenshotToggle/
+    ~/Library/Mobile Documents/com~apple~CloudDocs/Claude Project Archives/ScreenBar/
 
-Finder: **iCloud Drive → Claude Project Archives → ScreenshotToggle**
+Finder: **iCloud Drive → Claude Project Archives → ScreenBar**
 
 Put bulky, static, non-source material there — PDFs and specs, installer images,
 sample sources, firmware blobs, design intake, vendor archives. It is backed up by

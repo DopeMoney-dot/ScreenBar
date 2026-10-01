@@ -1,7 +1,7 @@
 import AppKit
 import ServiceManagement
 
-// ScreenshotToggle — a menu bar item that opens and closes Apple's Screenshot palette.
+// ScreenBar — a menu bar item that opens and closes Apple's Screenshot palette.
 //
 // Screenshot.app is only a launcher: it spawns `/usr/sbin/screencapture` (the interactive
 // palette) plus the resident `screencaptureui` service and then exits. So "is the palette
@@ -47,7 +47,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(.separator())
         loginItem.target = self
         menu.addItem(loginItem)
-        menu.addItem(NSMenuItem(title: "Quit ScreenshotToggle", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(title: "Quit ScreenBar", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
 
         refresh()
         pollTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
