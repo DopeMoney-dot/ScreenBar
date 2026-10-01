@@ -61,4 +61,9 @@ Driven with synthetic CGEvents against the real menu bar:
 Sources/main.swift      the whole app
 Resources/Info.plist    bundle metadata (LSUIElement)
 scripts/build.sh        build + ad-hoc sign + install
+LICENSE                 MIT
 ```
+
+## License
+
+MIT — see [LICENSE](LICENSE).
