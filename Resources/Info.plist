@@ -8,6 +8,8 @@
 	<string>ScreenBar</string>
 	<key>CFBundleExecutable</key>
 	<string>ScreenBar</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.thekitchenstudio.screenbar</string>
 	<key>CFBundlePackageType</key>

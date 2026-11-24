@@ -15,6 +15,7 @@ trap 'rm -rf "$BUILD"' EXIT
 
 mkdir -p "${APP}/Contents/MacOS" "${APP}/Contents/Resources"
 cp "${REPO}/Resources/Info.plist" "${APP}/Contents/Info.plist"
+cp "${REPO}/Resources/AppIcon.icns" "${APP}/Contents/Resources/AppIcon.icns"
 
 swiftc -O \
   -target arm64-apple-macos13.0 \
@@ -24,6 +25,18 @@ swiftc -O \
 
 codesign --force --sign - --identifier com.thekitchenstudio.screenbar "$APP"
 codesign --verify --strict "$APP"
+
+# Optional: `scripts/build.sh --dmg <folder>` also writes ScreenBar.dmg into <folder>.
+if [ "${1:-}" = "--dmg" ]; then
+  OUT="${2:?usage: build.sh --dmg <folder>}"
+  STAGE="${BUILD}/dmg"
+  mkdir -p "$STAGE" "$OUT"
+  cp -R "$APP" "$STAGE/"
+  ln -s /Applications "$STAGE/Applications"
+  rm -f "${OUT}/${APP_NAME}.dmg"
+  hdiutil create -quiet -volname "$APP_NAME" -srcfolder "$STAGE" -fs HFS+ -format UDZO "${OUT}/${APP_NAME}.dmg"
+  echo "dmg: ${OUT}/${APP_NAME}.dmg"
+fi
 
 mkdir -p "${HOME}/Applications"
 if [ -d "$DEST" ]; then

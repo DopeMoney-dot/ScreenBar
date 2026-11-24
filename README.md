@@ -20,6 +20,15 @@ scripts/build.sh      # builds, ad-hoc signs, installs to ~/Applications
 open ~/Applications/ScreenBar.app
 ```
 
+To also write a drag-to-Applications disk image:
+
+```sh
+scripts/build.sh --dmg ~/Desktop     # writes ~/Desktop/ScreenBar.dmg (and installs, as above)
+```
+
+The DMG is ad-hoc signed, **not notarized**: on another Mac, Gatekeeper will block the first
+launch — right-click the app → Open (or allow it in System Settings → Privacy & Security).
+
 Builds in `/private/tmp` on purpose: files created under `$HOME` pick up a
 `com.apple.provenance` xattr that makes `codesign` fail on a Swift binary.
 
@@ -105,7 +114,9 @@ Driven with synthetic CGEvents against the real menu bar:
 ```
 Sources/main.swift      the whole app (incl. the `--selftest <file>` permission check)
 Resources/Info.plist    bundle metadata (LSUIElement)
-scripts/build.sh        build + ad-hoc sign + install
+Resources/AppIcon.icns  app icon (generated — see scripts/make-icon.swift)
+scripts/build.sh        build + ad-hoc sign + install (+ optional --dmg <folder>)
+scripts/make-icon.swift the icon generator: SF Symbol camera.viewfinder on a dark tile
 LICENSE                 MIT
 ```
 
