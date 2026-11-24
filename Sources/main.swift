@@ -122,9 +122,65 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSWorkspace.shared.openApplication(at: screenshotAppURL, configuration: config)
     }
 
+    /// macOS stages an in-progress recording as `<UUID>.mov` here and only moves it to the save
+    /// location when Apple's own Stop button is used.
+    private let stagingDir = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent("Library/Group Containers/group.com.apple.screencapture/ScreenRecordings")
+
+    /// The staged file being written right now (modified within the last 3 s), if any.
+    private func activeRecording() -> URL? {
+        let keys: [URLResourceKey] = [.contentModificationDateKey]
+        let files = (try? FileManager.default.contentsOfDirectory(at: stagingDir, includingPropertiesForKeys: keys)) ?? []
+        return files.filter { $0.pathExtension == "mov" }
+            .compactMap { f -> (URL, Date)? in
+                guard let d = try? f.resourceValues(forKeys: Set(keys)).contentModificationDate else { return nil }
+                return (f, d)
+            }
+            .filter { Date().timeIntervalSince($0.1) < 3 }
+            .max { $0.1 < $1.1 }?.0
+    }
+
+    private func saveFolder() -> URL {
+        let out = run("/usr/bin/defaults", ["read", "com.apple.screencapture", "location"]).out
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if !out.isEmpty {
+            let url = URL(fileURLWithPath: (out as NSString).expandingTildeInPath)
+            if FileManager.default.fileExists(atPath: url.path) { return url }
+        }
+        return FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop")
+    }
+
     private func closePalette() {
-        for pid in palettePIDs() { kill(pid, SIGTERM) }
+        // A click on this icon while recording is almost always meant as "stop". Killing the
+        // recorder this way skips Apple's hand-off, which strands the finished movie in the
+        // staging folder. So: stop it, then do the hand-off ourselves.
+        let recording = activeRecording()
+        // SIGINT, not SIGTERM: SIGTERM discards an in-progress recording.
+        for pid in palettePIDs() { kill(pid, SIGINT) }
         lastSeenOpen = .distantPast
+        if let recording { DispatchQueue.global().async { [weak self] in self?.deliver(recording) } }
+    }
+
+    /// Wait for the recorder to exit and the file to stop growing, then move it to the save folder.
+    private func deliver(_ staged: URL) {
+        var lastSize = -1
+        for _ in 0..<40 {                       // up to ~10 s
+            Thread.sleep(forTimeInterval: 0.25)
+            let size = (try? staged.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? -1
+            if palettePIDs().isEmpty && size == lastSize && size > 0 { break }
+            lastSize = size
+        }
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "yyyy-MM-dd 'at' h.mm.ss a"
+        let dir = saveFolder()
+        var dest = dir.appendingPathComponent("Screen Recording \(f.string(from: Date())).mov")
+        var n = 2
+        while FileManager.default.fileExists(atPath: dest.path) {
+            dest = dir.appendingPathComponent("Screen Recording \(f.string(from: Date())) \(n).mov"); n += 1
+        }
+        do { try FileManager.default.moveItem(at: staged, to: dest) }
+        catch { NSLog("ScreenBar: could not move recording: \(error)") }
     }
 
     // MARK: - Login item
@@ -150,6 +206,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
+if let i = CommandLine.arguments.firstIndex(of: "--selftest"), i + 1 < CommandLine.arguments.count {
+    // Diagnostic: report whether THIS app identity can read the recording staging folder.
+    let dir = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent("Library/Group Containers/group.com.apple.screencapture/ScreenRecordings")
+    var report = ""
+    do { report = "ok: \(try FileManager.default.contentsOfDirectory(atPath: dir.path).count) entries\n" }
+    catch { report = "ERROR: \(error)\n" }
+    try? report.write(toFile: CommandLine.arguments[i + 1], atomically: true, encoding: .utf8)
+    exit(0)
+}
 let app = NSApplication.shared
 let delegate = AppDelegate()
 app.delegate = delegate
